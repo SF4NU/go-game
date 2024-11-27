@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	input "github.com/quasilyte/ebitengine-input"
 	"image"
 	_ "image/png"
 	"log"
@@ -11,8 +12,8 @@ import (
 )
 
 const (
-	screenWidth  = 320
-	screenHeight = 240
+	screenWidth  = 480
+	screenHeight = 360
 
 	frameOX     = 0
 	frameOY     = 32
@@ -26,11 +27,15 @@ var (
 )
 
 type Game struct {
-	count int
+	count       int
+	p           *player
+	inputSystem input.System
 }
 
 func (g *Game) Update() error {
 	g.count++
+	g.inputSystem.Update()
+	g.p.Update()
 	return nil
 }
 
@@ -40,11 +45,30 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	op.GeoM.Translate(screenWidth/2, screenHeight/2)
 	i := (g.count / 5) % frameCount
 	sx, sy := frameOX+i*frameWidth, frameOY
-	screen.DrawImage(runnerImage.SubImage(image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)).(*ebiten.Image), op)
+	character := runnerImage.SubImage(image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)).(*ebiten.Image)
+	g.p.Draw(screen, character)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return screenWidth, screenHeight
+}
+
+func newExampleGame() *Game {
+	g := &Game{}
+	g.inputSystem.Init(input.SystemConfig{
+		DevicesEnabled: input.AnyDevice,
+	})
+	keymap := input.Keymap{
+		ActionMoveLeft:  {input.KeyGamepadLeft, input.KeyLeft, input.KeyA},
+		ActionMoveRight: {input.KeyGamepadRight, input.KeyRight, input.KeyD},
+		ActionMoveUp:    {input.KeyGamepadUp, input.KeyUp, input.KeyW},
+		ActionMoveDown:  {input.KeyGamepadDown, input.KeyDown, input.KeyS},
+	}
+	g.p = &player{
+		input: g.inputSystem.NewHandler(0, keymap),
+		pos:   image.Point{X: 208, Y: 178},
+	}
+	return g
 }
 
 func main() {
@@ -57,7 +81,7 @@ func main() {
 
 	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
 	ebiten.SetWindowTitle("Animation (Ebitengine Demo)")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	if err := ebiten.RunGame(newExampleGame()); err != nil {
 		log.Fatal(err)
 	}
 }
