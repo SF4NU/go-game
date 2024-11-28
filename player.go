@@ -1,9 +1,10 @@
 package main
 
 import (
+	"image"
+
 	"github.com/hajimehoshi/ebiten/v2"
 	input "github.com/quasilyte/ebitengine-input"
-	"image"
 )
 
 const (
@@ -43,3 +44,4 @@ func (p *player) Draw(screen *ebiten.Image, character *ebiten.Image) {
 	op.GeoM.Translate(float64(p.pos.X), float64(p.pos.Y))
 	screen.DrawImage(character, op)
 }
+

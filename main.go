@@ -2,10 +2,12 @@ package main
 
 import (
 	"bytes"
-	input "github.com/quasilyte/ebitengine-input"
+	"go-game/src/assets/maps"
 	"image"
 	_ "image/png"
 	"log"
+
+	input "github.com/quasilyte/ebitengine-input"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/examples/resources/images"
@@ -24,6 +26,7 @@ const (
 
 var (
 	runnerImage *ebiten.Image
+	mapImage *maps.MapRenderer
 )
 
 type Game struct {
@@ -46,6 +49,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	i := (g.count / 5) % frameCount
 	sx, sy := frameOX+i*frameWidth, frameOY
 	character := runnerImage.SubImage(image.Rect(sx, sy, sx+frameWidth, sy+frameHeight)).(*ebiten.Image)
+	mapImage.Draw(screen)
 	g.p.Draw(screen, character)
 }
 
@@ -78,6 +82,11 @@ func main() {
 		log.Fatal(err)
 	}
 	runnerImage = ebiten.NewImageFromImage(img)
+	mapImage, _ = maps.NewMapRenderer("./assets/map/example.tmx")
+	err = mapImage.PreloadTiles()
+	if err != nil {
+		panic(err)
+	}
 
 	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
 	ebiten.SetWindowTitle("Animation (Ebitengine Demo)")
