@@ -3,6 +3,8 @@ package main
 import (
 	"github.com/hajimehoshi/ebiten/v2"
 	input "github.com/quasilyte/ebitengine-input"
+	"go-game/src"
+	"go-game/src/assets/audio"
 	"go-game/src/assets/player"
 	"go-game/src/resources/camera"
 	"image"
@@ -15,16 +17,23 @@ const (
 	screenHeight = 768
 )
 
+var (
+	lock bool
+)
+
 type Game struct {
-	Player      *player.Player
-	inputSystem input.System
-	Camera      *camera.Camera
+	Player           *player.Player
+	inputSystem      input.System
+	Camera           *camera.Camera
+	soundtrackPlayer *audio.SoundtrackPlayer
 }
 
 func (g *Game) Update() error {
 	g.Camera.Cam.LookAt(float64(g.Player.Pos.X), float64(g.Player.Pos.Y))
 	g.inputSystem.Update()
 	g.Player.Update()
+	g.soundtrackPlayer.Update()
+	src.InputHandler()
 	return nil
 }
 
@@ -42,6 +51,9 @@ func newExampleGame() *Game {
 	g.inputSystem.Init(input.SystemConfig{
 		DevicesEnabled: input.AnyDevice,
 	})
+	newSoundPlayer := audio.NewSoundtrackPlayer()
+	newSoundPlayer.PlayNext()
+	g.soundtrackPlayer = newSoundPlayer
 	keymap := input.Keymap{
 		player.ActionMoveLeft:  {input.KeyGamepadLeft, input.KeyLeft, input.KeyA},
 		player.ActionMoveRight: {input.KeyGamepadRight, input.KeyRight, input.KeyD},

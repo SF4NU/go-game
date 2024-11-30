@@ -18,7 +18,6 @@ const (
 	ActionMoveRight
 	ActionMoveUp
 	ActionMoveDown
-	Idle
 )
 
 type Player struct {
@@ -28,26 +27,32 @@ type Player struct {
 }
 
 func (p *Player) Update() {
-
 	if p.Input.ActionIsPressed(ActionMoveLeft) {
 		p.Pos.X -= 2
 		p.animPlayer.SetState("moveLeft")
+	} else if p.Input.ActionIsJustReleased(ActionMoveLeft) {
+		p.animPlayer.SetState("idleLeft")
 	}
 	if p.Input.ActionIsPressed(ActionMoveRight) {
 		p.Pos.X += 2
 		p.animPlayer.SetState("moveRight")
+	} else if p.Input.ActionIsJustReleased(ActionMoveRight) {
+		p.animPlayer.SetState("idleRight")
 	}
 	if p.Input.ActionIsPressed(ActionMoveUp) {
 		p.Pos.Y -= 2
 		p.animPlayer.SetState("moveUp")
+	} else if p.Input.ActionIsJustReleased(ActionMoveUp) {
+		p.animPlayer.SetState("idleUp")
 	}
 	if p.Input.ActionIsPressed(ActionMoveDown) {
 		p.Pos.Y += 2
 		p.animPlayer.SetState("moveDown")
+	} else if p.Input.ActionIsJustReleased(ActionMoveDown) {
+		p.animPlayer.SetState("idleDown")
 	}
-	if p.Input.ActionIsJustReleased(Idle) {
-		p.animPlayer.SetState("Idle")
-	}
+
+	log.Printf("PosX:%d PosY:%d", p.Pos.X, p.Pos.Y)
 	p.animPlayer.Update()
 }
 
@@ -77,17 +82,23 @@ func (p *Player) PlayerAnimations() *Player {
 	newPlayerImg := ebiten.NewImageFromImage(img)
 
 	animPlayer = anim.NewAnimationPlayer(newPlayerImg)
-	animPlayer.NewAnimationState("idle", 48, 0, 48, 48, 1, true, false)
-	animPlayer.NewAnimationState("moveDown", 0, 0, 48, 48, 5, true, false)
-	animPlayer.NewAnimationState("moveRight", 0, 48, 48, 48, 5, true, false)
-	animPlayer.NewAnimationState("moveLeft", 0, 96, 48, 48, 5, true, false)
-	animPlayer.NewAnimationState("moveUp", 0, 144, 48, 48, 5, true, false)
-	animPlayer.SetState("idle")
-	animPlayer.SetStateFPS("idle", 1)
-	animPlayer.SetStateFPS("moveDown", 5)
-	animPlayer.SetStateFPS("moveLeft", 5)
-	animPlayer.SetStateFPS("moveRight", 5)
-	animPlayer.SetStateFPS("moveUp", 5)
+	animPlayer.NewAnimationState("idleDown", 48, 0, 48, 48, 1, true, false)
+	animPlayer.NewAnimationState("idleUp", 48, 144, 48, 48, 1, true, false)
+	animPlayer.NewAnimationState("idleLeft", 48, 96, 48, 48, 1, true, false)
+	animPlayer.NewAnimationState("idleRight", 48, 48, 48, 48, 1, true, false)
+	animPlayer.NewAnimationState("moveDown", 0, 0, 48, 48, 4, true, false)
+	animPlayer.NewAnimationState("moveRight", 0, 48, 48, 48, 4, true, false)
+	animPlayer.NewAnimationState("moveLeft", 0, 96, 48, 48, 4, true, false)
+	animPlayer.NewAnimationState("moveUp", 0, 144, 48, 48, 4, true, false)
+	animPlayer.SetState("idleDown")
+	animPlayer.SetStateFPS("idleDown", 1)
+	animPlayer.SetStateFPS("idleUp", 1)
+	animPlayer.SetStateFPS("idleLeft", 1)
+	animPlayer.SetStateFPS("idleRight", 1)
+	animPlayer.SetStateFPS("moveDown", 6)
+	animPlayer.SetStateFPS("moveLeft", 6)
+	animPlayer.SetStateFPS("moveRight", 6)
+	animPlayer.SetStateFPS("moveUp", 6)
 	p.animPlayer = animPlayer
 	return p
 }
