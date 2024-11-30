@@ -51,10 +51,11 @@ func (p *Player) Update() {
 	p.animPlayer.Update()
 }
 
-func (p *Player) Draw(screen *ebiten.Image) {
+func (p *Player) Get() (*ebiten.Image, *ebiten.DrawImageOptions) {
 	op := &ebiten.DrawImageOptions{}
 	op.GeoM.Translate(float64(p.Pos.X), float64(p.Pos.Y))
-	screen.DrawImage(p.animPlayer.CurrentFrame, op)
+	//screen.DrawImage(p.animPlayer.CurrentFrame, op)
+	return p.animPlayer.CurrentFrame, op
 }
 
 func (p *Player) PlayerAnimations() *Player {

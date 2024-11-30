@@ -4,31 +4,33 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	input "github.com/quasilyte/ebitengine-input"
 	"go-game/src/assets/player"
+	"go-game/src/resources/camera"
 	"image"
 	_ "image/png"
 	"log"
 )
 
 const (
-	screenWidth  = 480
-	screenHeight = 360
+	screenWidth  = 1024
+	screenHeight = 768
 )
 
 type Game struct {
-	count       int
 	Player      *player.Player
 	inputSystem input.System
+	Camera      *camera.Camera
 }
 
 func (g *Game) Update() error {
-	g.count++
+	g.Camera.Cam.LookAt(float64(g.Player.Pos.X), float64(g.Player.Pos.Y))
 	g.inputSystem.Update()
 	g.Player.Update()
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	g.Player.Draw(screen)
+	playerImg, op := g.Player.Get()
+	g.Camera.Cam.Draw(playerImg, op, screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
@@ -48,14 +50,15 @@ func newExampleGame() *Game {
 	}
 	g.Player = &player.Player{
 		Input: g.inputSystem.NewHandler(0, keymap),
-		Pos:   image.Point{X: 208, Y: 178},
+		Pos:   image.Point{X: screenWidth / 2, Y: screenHeight / 2},
 	}
 	g.Player.PlayerAnimations()
+	g.Camera = camera.New(screenWidth, screenHeight, g.Player.Pos.X, g.Player.Pos.Y)
 	return g
 }
 
 func main() {
-	ebiten.SetWindowSize(screenWidth*2, screenHeight*2)
+	ebiten.SetWindowSize(screenWidth, screenHeight)
 	ebiten.SetWindowTitle("Animation (Ebitengine Demo)")
 	if err := ebiten.RunGame(newExampleGame()); err != nil {
 		log.Fatal(err)
