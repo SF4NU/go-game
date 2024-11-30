@@ -6,14 +6,8 @@ import (
 	_ "embed"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/vorbis"
-	"io"
 	"log"
 )
-
-type audioStream interface {
-	io.ReadSeeker
-	Length() int64
-}
 
 const (
 	sampleRate     = 44100
@@ -69,6 +63,7 @@ func (s *SoundtrackPlayer) PlayNext() {
 	}
 
 	s.player.Play()
+	s.player.SetVolume(0.1)
 	s.currentIndex++
 }
 

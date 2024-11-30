@@ -17,10 +17,6 @@ const (
 	screenHeight = 768
 )
 
-var (
-	lock bool
-)
-
 type Game struct {
 	Player           *player.Player
 	inputSystem      input.System
@@ -59,12 +55,14 @@ func newExampleGame() *Game {
 		player.ActionMoveRight: {input.KeyGamepadRight, input.KeyRight, input.KeyD},
 		player.ActionMoveUp:    {input.KeyGamepadUp, input.KeyUp, input.KeyW},
 		player.ActionMoveDown:  {input.KeyGamepadDown, input.KeyDown, input.KeyS},
+		player.ActionItem1:     {input.KeyGamepadR1, input.Key1, input.KeyNum1},
+		player.ActionItem2:     {input.KeyGamepadR1, input.Key2, input.KeyNum2},
 	}
 	g.Player = &player.Player{
 		Input: g.inputSystem.NewHandler(0, keymap),
 		Pos:   image.Point{X: screenWidth / 2, Y: screenHeight / 2},
 	}
-	g.Player.PlayerAnimations()
+	g.Player.PlayerAnimationsNormal()
 	g.Camera = camera.New(screenWidth, screenHeight, g.Player.Pos.X, g.Player.Pos.Y)
 	return g
 }
