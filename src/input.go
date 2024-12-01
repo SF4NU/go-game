@@ -2,6 +2,7 @@ package src
 
 import (
 	"github.com/hajimehoshi/ebiten/v2"
+	"os"
 	"time"
 )
 
@@ -9,8 +10,10 @@ var (
 	lock bool
 )
 
+// InputHandler handles general input needed for closing game or fullscreen, many others to add...
 func InputHandler() {
 	fullScreen()
+	exitGame()
 }
 
 func fullScreen() {
@@ -30,5 +33,11 @@ func fullScreen() {
 				lock = false
 			}()
 		}
+	}
+}
+
+func exitGame() {
+	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+		os.Exit(0)
 	}
 }

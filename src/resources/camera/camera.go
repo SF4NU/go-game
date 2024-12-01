@@ -12,6 +12,7 @@ func New(w, h, x, y int) *Camera {
 	}
 	newCam.Cam.ZoomFactor = 3
 	newCam.Cam.LerpEnabled = true
+	newCam.Cam.LerpSpeed = 0.7
 	newCam.Cam.ShakeEnabled = true
 	return newCam
 }

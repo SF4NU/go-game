@@ -1,4 +1,4 @@
-package audio
+package ost
 
 import (
 	"bytes"
@@ -9,12 +9,7 @@ import (
 	"log"
 )
 
-const (
-	sampleRate     = 44100
-	bytesPerSample = 8
-)
-
-//go:embed ost/*.ogg
+//go:embed tracks/*.ogg
 var audioFiles embed.FS
 
 type SoundtrackPlayer struct {
@@ -24,14 +19,13 @@ type SoundtrackPlayer struct {
 	player       *audio.Player
 }
 
-func NewSoundtrackPlayer() *SoundtrackPlayer {
-	audioContext := audio.NewContext(sampleRate)
-	trackFiles := []string{"ost/The-Quest-Unfolds.ogg"}
+func NewSoundtrackPlayer(audioContext *audio.Context) *SoundtrackPlayer {
+	trackFiles := []string{"tracks/The-Quest-Unfolds.ogg"}
 	var tracks [][]byte
 	for _, file := range trackFiles {
 		data, err := audioFiles.ReadFile(file)
 		if err != nil {
-			log.Fatalf("Failed to read audio file: %v", err)
+			log.Fatalf("Failed to read sound file: %v", err)
 		}
 		tracks = append(tracks, data)
 	}
@@ -53,17 +47,17 @@ func (s *SoundtrackPlayer) PlayNext() {
 	}
 
 	track := s.tracks[s.currentIndex]
-	stream, err := vorbis.DecodeWithSampleRate(sampleRate, bytes.NewReader(track))
+	stream, err := vorbis.DecodeWithSampleRate(44100, bytes.NewReader(track))
 	if err != nil {
-		log.Fatalf("Failed to decode audio track: %v", err)
+		log.Fatalf("Failed to decode sound track: %v", err)
 	}
 	s.player, err = (*s.audioContext).NewPlayer(stream)
 	if err != nil {
-		log.Fatalf("Failed to create audio player: %v", err)
+		log.Fatalf("Failed to create sound player: %v", err)
 	}
 
 	s.player.Play()
-	s.player.SetVolume(0.1)
+	s.player.SetVolume(0.05)
 	s.currentIndex++
 }
 
